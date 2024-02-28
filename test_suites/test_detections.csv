@@ -1,0 +1,27 @@
+ObjID,FieldMJD_TAI,should_detect,should_trigger,intended_detection_note
+3,60289.5,FALSE,FALSE,not enough data
+3,60289.53,FALSE,FALSE,not enough data
+3,60291,FALSE,FALSE,not enough data
+3,60294,FALSE,FALSE,not enough data
+3,60300,TRUE,TRUE,standard detection
+3,60303,TRUE,FALSE,second detection
+3,60305,FALSE,FALSE,edge case with elapsed time = max timewindow
+9,1,FALSE,FALSE,not enough data
+1,1.2,FALSE,FALSE,not enough data
+9,3,FALSE,FALSE,not enough data
+1,5,FALSE,FALSE,not enough data
+99,2,FALSE,FALSE,not enough data
+1,4,FALSE,FALSE,not enough data
+9,1.3,FALSE,FALSE,not enough data
+1,12,TRUE,TRUE,detection from unsorted data
+9,12,FALSE,FALSE,not enough data
+9,13,TRUE,TRUE,detection from ungrouped data
+1,2,FALSE,FALSE,not enough data
+nein,60301,FALSE,FALSE,not enough data
+nein,60305,FALSE,FALSE,not enough data
+nein,60306,FALSE,FALSE,not enough data
+nein,60310,FALSE,FALSE,not enough data
+nein,60315,FALSE,FALSE,edge case with elapsed time = max timewindow
+nein,60319,FALSE,FALSE,repeated case with elapsed time always = max timewindow
+nein,60320,FALSE,FALSE,repeated case with elapsed time always = max timewindow
+nein,60324,FALSE,FALSE,repeated case with elapsed time always = max timewindow
