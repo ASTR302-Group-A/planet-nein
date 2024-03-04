@@ -2,6 +2,11 @@ import pandas as pd
 import numpy as np
 from pandas import DataFrame as df
 
+# Reading in .csv
+phys_para = pd.read_csv('reference_population.csv',
+                      skiprows = [0,1,2,3], # Skipping extraneous rows
+                      index_col = 'index')
+
 # Copy phys_para to manipulate
 para_copy = phys_para[[" V"]].copy()
 para_copy = para_copy.rename(columns={' V': 'H'})   # Changed variable apparent mag to absolute mag
