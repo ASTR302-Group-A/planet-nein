@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame as df
 
-def change_orbit_format(filename):
+def change_orbit_format():
     """
     
     This function will change the format of the orbital file to one that is is needed for Sorcha to run properly.
@@ -42,7 +42,7 @@ def change_orbit_format(filename):
     
     """
     
-    df_orbit = pd.read_csv(filename,
+    df_orbit = pd.read_csv('reference_population.csv',
                  skiprows = [0,1,2,3], #Skips the rows with the comments about the specific columns
                  index_col = ["index"])
     
