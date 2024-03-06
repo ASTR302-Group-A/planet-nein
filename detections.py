@@ -1,8 +1,9 @@
 # imports
 import pandas as pd
 import numpy as np
+from astropy.time import Time
 
-def planet_detected(obs_df, my_objID,
+def single_planet_detect(obs_df, my_objID,
                     min_detections=5, max_timewindow=14):
     '''Determines if planet would be detected based on Rubin algorithm
     
@@ -49,7 +50,7 @@ def planet_detected(obs_df, my_objID,
 
 
 
-def planet_detections_multi(sorcha_output_filename):
+def planet_detections(sorcha_output_filename):
     '''
     One-stop shop to get the initial detections of all objects from
     our Sorcha output file. Returns a dataframe of all unique object IDs
@@ -77,7 +78,7 @@ def planet_detections_multi(sorcha_output_filename):
 
     for objID in unique_objects['ObjID']:
         # find detection dates
-        detections = planet_detected(obs_df, my_objID=objID);
+        detections = single_planet_detect(obs_df, my_objID=objID);
         # isolate dates as numpy array
         detection_dates = detections['FieldMJD_TAI'].to_numpy();
         # update the detection date for all rows with this ID
@@ -92,12 +93,59 @@ def planet_detections_multi(sorcha_output_filename):
     return unique_objects;
 
 
-def test_planet_detections(troubleshoot_mode=False):
+def orbits_detected_by(detections, dateMJD):
+    '''
+    Takes the detections file from planet_detections and a date, returns the
+    subset of unique orbits that would have been detected by that date
+    
+    PARAMETERS:
+    detections : pandas database
+        Assumed to be the output of planet_detections(). Must have columns
+        ObjID and date_detectedMJD_TAI, with one entry for each unique object
+    dateMJD : float
+        the date (in MJD, TAI) to limit further detections at
+        
+    RETURNS:
+    planets_detected : list
+        list of object IDs that would be detected by the morning of the given
+        date. Format is in MJD_TAI
+    '''
+    planets_detected = detections.loc[ 
+                        detections['detectedMJD_TAI']<=dateMJD,
+                        'ObjID'];
+    return planets_detected.to_list();
+
+
+
+def mjd_to_utc(mjd):
+    '''
+    Convenience function converts a date (int or float) in MJD format to a
+    datetime object in UTC
+    
+    PARAMETERS:
+    mjd : int or float
+        A date in MJD format
+    
+    RETURNS:
+    utc : datetime object
+        datetime object in utc
+    '''
+    # convert MJD to Julian Date, then convert to astropy Time object
+    t = Time(mjd + 2400000.5, format='jd');
+
+    # Convert to datetime
+    utc = t.to_datetime()
+    
+    return utc;
+
+
+
+def test(troubleshoot_mode=False):
     '''
     Test suite for validating that the planet_detected is running 
     properly. Requires access to the file "test_planet_detection_data.csv"
     
-    Parameters:
+    PARAMETERS:
     troubleshoot_mode: boolean, default False
         optional argument that prints out a more detailed summary of
         the tests for troubleshooting.
@@ -143,3 +191,4 @@ def test_planet_detections(troubleshoot_mode=False):
         display(errors)
     
     return;
+
