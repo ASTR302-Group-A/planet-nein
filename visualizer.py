@@ -79,11 +79,8 @@ def visualize_orbits(orbits, count, elevation = 30, azimuth = 40, zoom = 1):
     #plt.legend(loc="upper right");
     
     
-def interactive_plot():
     
-    # Randomize the reference population data
-    reference_population = pd.read_csv("reference_population.csv", comment = "#")
-    reference_population = reference_population.sample(frac = 1).reset_index(drop = True)
+def interactive_plot(reference_population):
 
     orbit_data = solar_system.copy()
     for i in range(1000):

@@ -1,6 +1,7 @@
 # imports
 import pandas as pd
 import numpy as np
+import sqlite3
 from astropy.time import Time
 
 def single_planet_detect(obs_df, my_objID,
@@ -93,7 +94,7 @@ def planet_detections(sorcha_output_filename):
     return unique_objects;
 
 
-def orbits_detected_by(detections, dateMJD):
+def orbits_detectable_by(detections, dateMJD):
     '''
     Takes the detections file from planet_detections and a date, returns the
     subset of unique orbits that would have been detected by that date
@@ -106,37 +107,58 @@ def orbits_detected_by(detections, dateMJD):
         the date (in MJD, TAI) to limit further detections at
         
     RETURNS:
-    planets_detected : list
-        list of object IDs that would be detected by the morning of the given
+    detectable_IDs : list
+        list of orbit IDs that would be detected by the morning of the given
         date. Format is in MJD_TAI
+    candidate_IDs : list
+        list of orbit IDs that are still potential candidates
     '''
-    planets_detected = detections.loc[ 
+    detectable_IDs = detections.loc[
                         detections['detectedMJD_TAI']<=dateMJD,
                         'ObjID'];
-    return planets_detected.to_list();
+    candidate_IDs = detections.loc[
+                        detections['detectedMJD_TAI']>dateMJD,
+                        'ObjID'];
+    return [detectable_IDs.to_list(), candidate_IDs.to_list()];
 
 
 
-def mjd_to_utc(mjd):
+def get_obsdates(pointing_db_file):
     '''
-    Convenience function converts a date (int or float) in MJD format to a
-    datetime object in UTC
+    Returns a list of strings representing each unique date with planned
+    observations, based on the pointing database
     
     PARAMETERS:
-    mjd : int or float
-        A date in MJD format
+    pointing_db_file : string
+        file location of the pointing database
     
     RETURNS:
-    utc : datetime object
-        datetime object in utc
+    obs_dates : list
+        list of all unique dates that have a planned observation,
+        sorted from earliest to latest, each represented as a string
+        in format 'YYYY-MM-DD'
     '''
-    # convert MJD to Julian Date, then convert to astropy Time object
-    t = Time(mjd + 2400000.5, format='jd');
-
-    # Convert to datetime
-    utc = t.to_datetime()
+    # read in all observation start dates
+    con = sqlite3.connect(pointing_db_file);
+    result = pd.read_sql("""
+        SELECT
+            DISTINCT(observationStartMJD)
+        FROM
+            observations
+        """, con)
+    con.close();
     
-    return utc;
+    # get just the unique dates (all time components set to midnight)
+    full_dates = list(set(np.floor(result['observationStartMJD'])));
+    
+    # convert from mjd format to iso format for human readability
+    full_dates = Time(full_dates, format='mjd')
+    full_dates.format = 'iso';
+    
+    # pull just the date from the datetime string
+    obs_dates = [iso_date[0:10] for iso_date in full_dates.value];
+    
+    return obs_dates;
 
 
 
